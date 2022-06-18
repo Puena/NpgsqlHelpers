@@ -13,39 +13,47 @@ namespace NpgsqlHelpers
         static readonly MemoryCache<CreateNpgsqlCommandDelegate> cache = new();
         #endregion
 
-        private static NpgsqlCommand ComposeNpgsqlCommand(string key, object? data)
+        #region Methods
+        /// <summary>
+        /// Get delegate from cache or add it and return.
+        /// </summary>
+        /// <param name="key">Key is a query.</param>
+        /// <param name="data">Parameters data object.</param>
+        /// <returns>Return <see cref="NpgsqlCommand"/>NpgsqlCommand.</returns>
+        private static NpgsqlCommand GetOrAddNpgsqlCommand(string key, object? data)
         {
             if (data == null)
             {
                 return new NpgsqlCommand(key);
             }
 
-            var command = cache.Get(key);
+            var cacheItem = cache.Get(key);
 
-            if (command == null)
+            if (cacheItem == null)
             {
                 var parsedQuery = ComposeQuery.ParseQuery(key);
                 var createdDelegate = ComposeIL.CreateNpgsqlCommand(parsedQuery, data.GetType());
 
                 cache.TryAdd(key, createdDelegate);
-                command = cache.Get(key);
+                cacheItem = cache.Get(key);
             }
 
-            return command!.Value(data);
+            return cacheItem!.Value(data);
         }
 
-        public static NpgsqlCommand GetNpgsqlCommand(string key, object? data)
+        public static NpgsqlCommand GetNpgsqlCommand(string query, object? data)
         {
-            return ComposeNpgsqlCommand(key, data);
+            return GetOrAddNpgsqlCommand(query, data);
         }
 
-        public static NpgsqlCommand GetNpgsqlCommand(string key, object? data, NpgsqlConnection conn)
+        public static NpgsqlCommand GetNpgsqlCommand(string query, object? data, NpgsqlConnection conn)
         {
 
-            var command = ComposeNpgsqlCommand(key, data);
+            var command = GetOrAddNpgsqlCommand(query, data);
             command.Connection = conn;
 
             return command;
         }
+        #endregion
     }
 }
