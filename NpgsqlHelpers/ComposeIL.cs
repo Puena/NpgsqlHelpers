@@ -16,9 +16,9 @@ namespace NpgsqlHelpers
         /// <summary>
         /// Create IL version of function like this 
         /// <code>
-        /// public static NpgsqlCommand SomeName(object data)
+        /// public static NpgsqlCommand SomeName(object _data)
         /// {
-        ///     Person person = (Person)data;
+        ///     Person person = (Person)_data;
         ///     NpgsqlCommand command = new NpgsqlCommand("SELECT * FROM shops WHERE name=$1");
         ///     command.Parameters.Add(new NpgsqlParameter<string>() { TypedValue = person.Name});
         ///     command.Parameters.Add(new NpgsqlParameter<string>() { TypedValue = person.LastName});
@@ -30,7 +30,7 @@ namespace NpgsqlHelpers
         /// </summary>
         /// <param name="sql">Npgsql sql string</param>
         /// <param name="sqlParams">Parameters name</param>
-        /// <param name="dataType">Type of parameters data</param>
+        /// <param name="dataType">Type of parameters _data</param>
         /// <returns>Return <see cref="CreateNpgsqlCommandDelegate"/>delegate</returns>
         /// <exception cref="MissingFieldException"></exception>
         /// <exception cref="MissingMethodException"></exception>
