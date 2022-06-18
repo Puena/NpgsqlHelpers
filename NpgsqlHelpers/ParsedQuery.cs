@@ -12,5 +12,5 @@ namespace NpgsqlHelpers
     /// <param name="InitQuery">User defined query, like: SELECT * FROM shops WHERE Id = @Id</param>
     /// <param name="NpgsqlQuery">Parsed query for npgsql format, like: SELECT * FROM shops WHERE Id = $1</param>
     /// <param name="ParamNames">Parameters name with strict order, like: ["Id"]</param>
-    internal record ParsedQuery(string InitQuery, string NpgsqlQuery, string[] ParamNames);
+    public record ParsedQuery(string InitQuery, string NpgsqlQuery, string[] ParamNames);
 }

@@ -6,62 +6,63 @@ using System.Threading.Tasks;
 
 namespace NpgsqlHelpers
 {
-    internal static class ComposeQueryFactory
+    public static class ComposeQuery
     {
-        private static readonly char[] _stopChars = new char[] { ' ', ',', ':', ')', '\t', '\n', ';' };
-        private static readonly char _atSign = '@';
+        private static readonly char[] stopChars = new char[] { ' ', ',', ':', ')', '\t', '\n', ';' };
+        private static readonly char atSign = '@';
 
         /// <summary>
         /// Compose Npgsql query from user query!
         /// </summary>
-        /// <param name="initQuery"></param>
+        /// <param name="initQuery">Raw user string, like: SELECT * FROM shops WHERE Id = @Id"</param>
         /// <returns>Return <see cref="ParsedQuery">ParsedQuery record</see>.</returns>
         /// <exception cref="ArgumentNullException">Throw exception if <paramref name="initQuery"/> is null</exception>
-        internal static ParsedQuery ParseQuery(string initQuery)
+        public static ParsedQuery ParseQuery(string initQuery)
         {
             if (string.IsNullOrEmpty(initQuery)) throw new ArgumentNullException(nameof(initQuery), "Query can not be null or empy string!");
 
-            StringBuilder _parsedQuery = new();
-            StringBuilder _fieldName = new();
-            List<string> _fieldsNames = new();
+            StringBuilder parsedQuery = new();
+            StringBuilder fieldName = new();
+            List<string> fieldsNames = new();
+
             bool start = false;
             int position = 0;
 
-            foreach (char c in initQuery)
+            foreach (char c in initQuery.AsSpan())
             {
                 if (start)
                 {
-                    if (_stopChars.Any(sc => sc == c))
+                    if (stopChars.Any(sc => sc == c))
                     {
-                        _fieldsNames.Add(_fieldName.ToString());
-                        _parsedQuery.Append(c);
+                        fieldsNames.Add(fieldName.ToString());
+                        parsedQuery.Append(c);
                         start = false;
-                        _fieldName.Clear();
+                        fieldName.Clear();
                     }
                     else
                     {
-                        _fieldName.Append(c);
+                        fieldName.Append(c);
                     }
                 }
-                else if (c == _atSign)
+                else if (c == atSign)
                 {
                     start = true;
                     position++;
-                    _parsedQuery.Append($"${position}");
+                    parsedQuery.Append($"${position}");
                 }
                 else
                 {
-                    _parsedQuery.Append(c);
+                    parsedQuery.Append(c);
                 }
             }
 
             if (start)
             {
-                _fieldsNames.Add(_fieldName.ToString());
-                _fieldName.Clear();
+                fieldsNames.Add(fieldName.ToString());
+                fieldName.Clear();
             }
 
-            return new ParsedQuery(initQuery, _parsedQuery.ToString(), _fieldsNames.ToArray());
+            return new ParsedQuery(initQuery, parsedQuery.ToString(), fieldsNames.ToArray());
         }
     }
 }
