@@ -15,7 +15,7 @@ namespace NpgsqlHelpers
         /// Compose Npgsql query from user query!
         /// </summary>
         /// <param name="initQuery">Raw user string, like: SELECT * FROM shops WHERE Id = @Id"</param>
-        /// <returns>Return <see cref="ParsedQuery">ParsedQuery record</see>.</returns>
+        /// <returns>Return <see cref="ParsedQuery"> ParsedQuery </see>record.</returns>
         /// <exception cref="ArgumentNullException">Throw exception if <paramref name="initQuery"/> is null</exception>
         public static ParsedQuery ParseQuery(string initQuery)
         {
